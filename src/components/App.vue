@@ -11,18 +11,17 @@
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
           <a class="navbar-brand" href="">{{ appName }}</a>
-         
         </div>
       </nav>
 
-        <section class="py-4">
-          <div class="container py-3 h-100">
-            <div
-              class="row d-flex justify-content-center align-items-center h-100"
-            >
-              <div class="col-md-8 col-lg-6 col-xl-4">
-                <h3 class="mb-4 pb-2 fw-normal">Check the weather forecast</h3>
-
+      <section class="py-4">
+        <div class="container py-3 h-100">
+          <div
+            class="row d-flex justify-content-center align-items-center h-100"
+          >
+            <div class="col-md-8 col-lg-6 col-xl-4">
+              <h3 class="mb-4 pb-2 fw-normal">Check the weather forecast</h3>
+              <form @submit.prevent="onSubmit">
                 <div class="input-group rounded mb-3">
                   <input
                     type="search"
@@ -30,69 +29,50 @@
                     placeholder="City"
                     aria-label="Search"
                     aria-describedby="search-addon"
+                    v-model="v$.form.cityname.$model"
                   />
-                  <a href="#!" type="button">
-                    <span
-                      class="input-group-text border-0 fw-bold"
-                      id="search-addon"
+                  <div class="px-2">
+                    <button
+                      v-on:click="onSubmit"
+                      :disabled="v$.form.$invalid"
+                      class="btn btn-dark px-2"
+                      type="button"
                     >
                       Check!
-                    </span>
-                  </a>
-                </div>
-
-                <div class="mb-4 pb-2">
-                  <div class="form-check form-check-inline">
-                    <input
-                      class="form-check-input"
-                      type="radio"
-                      name="inlineRadioOptions"
-                      id="inlineRadio1"
-                      value="option1"
-                      checked
-                    />
-                    <label class="form-check-label" for="inlineRadio1"
-                      >Celsius</label
-                    >
-                  </div>
-
-                  <div class="form-check form-check-inline">
-                    <input
-                      class="form-check-input"
-                      type="radio"
-                      name="inlineRadioOptions"
-                      id="inlineRadio2"
-                      value="option2"
-                    />
-                    <label class="form-check-label" for="inlineRadio2"
-                      >Farenheit</label
-                    >
+                    </button>
                   </div>
                 </div>
+              </form>
 
-                <div class="card shadow-0 border">
-                  <div class="card-body p-4">
-                    <h4 class="mb-1 sfw-normal">New York, US</h4>
-                    <p class="mb-2">
-                      Current temperature: <strong>5.42°C</strong>
-                    </p>
-                    <p>Feels like: <strong>4.37°C</strong></p>
-                    <p>
-                      Max: <strong>6.11°C</strong>, Min: <strong>3.89°C</strong>
-                    </p>
-
-                    <div class="d-flex flex-row align-items-center">
-                      <p class="mb-0 me-4">Scattered Clouds</p>
-                    <img src="http://openweathermap.org/img/w/01n.png" height="80" width="100" alt="">
-                      <!-- <i class="fas fa-cloud fa-3x" style="color: #eee"></i> -->
-                    </div>
-                  </div>
+              <div class="mb-4 pb-2">
+                <div
+                  v-for="(option, index) in tempUnitOptions"
+                  :key="index"
+                  class="form-check form-check-inline"
+                >
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    :id="option.value"
+                    :value="option.id"
+                    v-model="tempUnit"
+                    name="temperature_unit"
+                    v-on:change="checkWhether"
+                  />
+                  <label class="form-check-label" :for="option.value">{{
+                    option.value
+                  }}</label>
                 </div>
               </div>
+
+              <weather-card
+                :selected-unit="tempUnit"
+                :unit-options="tempUnitOptions"
+              />
             </div>
           </div>
-        </section>
-   
+        </div>
+      </section>
     </v-wait>
   </div>
 </template>
@@ -107,16 +87,30 @@ import configValues from "../../vue.config";
 import { ref, onMounted, computed } from "vue";
 import { useGeolocationStore } from "../stores/geolocation";
 import { useWeatherStore } from "../stores/weather";
+import WeatherCard from "./WetherCard.vue";
+import useVuelidate from "@vuelidate/core";
+import { required, email, minLength } from "@vuelidate/validators";
 
 export default {
   setup() {
     const geolocationInstance = useGeolocationStore();
     const weatherInstance = useWeatherStore();
 
-    return { geolocationInstance, weatherInstance };
+    return { geolocationInstance, weatherInstance, v$: useVuelidate() };
   },
   components: {
     Loading,
+    WeatherCard,
+  },
+
+  validations() {
+    return {
+      form: {
+        cityname: {
+          required,
+        },
+      },
+    };
   },
 
   data: () => ({
@@ -124,8 +118,28 @@ export default {
     layout: null,
     defaultLayout: "default",
     fullPageLoader: true,
-    isLoading: false,
+    isLoading: true,
     loaderColor: "#FD6481",
+    tempUnitOptions: [
+      {
+        id: 1,
+        value: "Celsius",
+        unit: "metric",
+        symbol: "C",
+        speed: "metre/sec",
+      },
+      {
+        id: 2,
+        value: "Farenheit",
+        unit: "imperial",
+        symbol: "F",
+        speed: "miles/hour",
+      },
+    ],
+    tempUnit: 1,
+    form: {
+      cityname: "",
+    },
   }),
 
   computed: {
@@ -209,17 +223,46 @@ export default {
     this.showLoader();
     let x = Math.floor(Math.random() * 24000 + 1);
     this.geolocationInstance.fetchRandomGeolocation(x);
-    console.log("lat", this.latitude);
-    console.log("long", this.longitude);
+    let tempSelectedOption = this.tempUnitOptions.findIndex(
+      (item) => item.id === this.tempUnit
+    );
     this.weatherInstance.fetchWeather({
       lat: this.latitude,
       lon: this.longitude,
+      unit: this.tempUnitOptions[tempSelectedOption].unit,
     });
     this.hideLoader();
     this.$wait.end("loadcontent");
   },
 
   methods: {
+    async checkWhether() {
+      this.showLoader();
+      let tempSelectedOption = this.tempUnitOptions.findIndex(
+        (item) => item.id === this.tempUnit
+      );
+      await this.weatherInstance.fetchWeather({
+        lat: this.latitude,
+        lon: this.longitude,
+        unit: this.tempUnitOptions[tempSelectedOption].unit,
+      });
+      this.hideLoader();
+    },
+
+    async onSubmit() {
+      this.showLoader();
+      await this.geolocationInstance.fetchGeolocation(this.form.cityname);
+      let tempSelectedOption = this.tempUnitOptions.findIndex(
+        (item) => item.id === this.tempUnit
+      );
+      await this.weatherInstance.fetchWeather({
+        lat: this.latitude,
+        lon: this.longitude,
+        unit: this.tempUnitOptions[tempSelectedOption].unit,
+      });
+      this.hideLoader();
+    },
+
     showLoader() {
       if (!this.isLoading) {
         this.isLoading = true;

@@ -11,7 +11,7 @@
 </template>
 
 <script>
-// https://github.com/nuxt/nuxt.js/blob/master/lib/app/components/nuxt-loading.vue
+
 export default {
   data: () => ({
     percent: 0,
@@ -19,8 +19,8 @@ export default {
     canSuccess: true,
     duration: 3000,
     height: '2px',
-    color: '#77b6ff',
-    failedColor: 'red'
+    color: '#212529',
+    failedColor: '#212529'
   }),
 
   methods: {
@@ -97,7 +97,7 @@ export default {
   width: 0%;
   transition: width 0.2s, opacity 0.4s;
   opacity: 1;
-  background-color: #fd6481;
+  background-color: #212529;
   z-index: 999999;
 }
 </style>

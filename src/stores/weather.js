@@ -30,7 +30,7 @@ export const useWeatherStore = defineStore("weather", {
   actions: {
     async fetchWeather(payload) {
       try {
-        let locationUrl = `${configValues.VUE_APP_WEATHER_API_URL}?lat=${payload.lat}&lon=${payload.lon}&exclude=hourly,daily,minutely,&appid=${configValues.API_KEY}`;
+        let locationUrl = `${configValues.VUE_APP_WEATHER_API_URL}?lat=${payload.lat}&lon=${payload.lon}&units=${payload.unit}&exclude=hourly,daily,minutely,&appid=${configValues.API_KEY}`;
         const data = await axios.get(locationUrl);
         this.updateWether(data.data.current)
       } catch (error) {

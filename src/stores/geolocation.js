@@ -11,7 +11,8 @@ export const useGeolocationStore = defineStore("geolocation", {
     latitude: "",
     longitude: "",
     city: "",
-    countryCode:''
+    countryCode:'',
+    state:''
   }),
   getters: {},
   actions: {
@@ -28,6 +29,7 @@ export const useGeolocationStore = defineStore("geolocation", {
           latitude: data.data[0].lat,
           longitude: data.data[0].lon,
           city: data.data[0].name,
+          countryCode:data.data[0].country,
         };
         this.updateGeLocation(payloadData);
       } catch (error) {
