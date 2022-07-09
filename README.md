@@ -27,3 +27,20 @@ Your app should be a client for the [Open Weather Map API](http://openweathermap
 - Gracefully handle the case where the location could not be found (display the information to the user)
 
 Have fun!
+
+1) install vue and boiler plate code and bootstrap on it.
+2) add whether api in system and test call of api and read documentation of api how we can use it.
+3) use Store to call api. (check local machine code).
+4) display whether of random cities.
+5) Add form to check particular city whether and have to add loader on it.
+6) create component for whether cards.
+7) Location not found page has to implement.
+8) Try to implement chaching in local machine.
+
+
+https://api.openweathermap.org/data/3.0/onecall?lat=33.44&lon=-94.04&appid=69e07e9209293d0fa82a6b0731af60c9
+
+http://api.openweathermap.org/geo/1.0/direct?q=London&limit=5&appid=69e07e9209293d0fa82a6b0731af60c9
+
+
+
