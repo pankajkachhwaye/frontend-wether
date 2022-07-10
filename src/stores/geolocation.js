@@ -3,6 +3,8 @@ import { defineStore } from "pinia";
 // Import axios to make HTTP requests
 import axios from "axios";
 import configValues from "../../vue.config";
+import Swal from 'sweetalert2'
+
 
 export const useGeolocationStore = defineStore("geolocation", {
   persist: true,
@@ -12,7 +14,8 @@ export const useGeolocationStore = defineStore("geolocation", {
     longitude: "",
     city: "",
     countryCode:'',
-    state:''
+    state:'',
+    error:null
   }),
   getters: {},
   actions: {
@@ -25,15 +28,22 @@ export const useGeolocationStore = defineStore("geolocation", {
           "&limit=5&appid=" +
           configValues.API_KEY;
         const data = await axios.get(locationUrl);
-        let payloadData = {
-          latitude: data.data[0].lat,
-          longitude: data.data[0].lon,
-          city: data.data[0].name,
-          countryCode:data.data[0].country,
-        };
-        this.updateGeLocation(payloadData);
+        console.log('data',data)
+        if(data.data.length > 0){
+            let payloadData = {
+                latitude: data.data[0].lat,
+                longitude: data.data[0].lon,
+                city: data.data[0].name,
+                countryCode:data.data[0].country,
+              };
+              this.updateGeLocation(payloadData);
+        }
+        else{
+            Swal.fire('Location not Found!');
+        }
+        
       } catch (error) {
-        console.log("error", error);
+        Swal.fire('something went wrong!');
       }
     },
     updateGeLocation(payload) {

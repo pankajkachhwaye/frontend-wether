@@ -6,6 +6,8 @@ import "bootstrap"
 import { createPinia } from 'pinia';
 import { createVueWait } from 'vue-wait'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -15,6 +17,7 @@ pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
 app.use(router)
 app.use(VueWait)
+app.use(VueSweetalert2);
 
 router.isReady().then(() => {
     app.mount("#app");

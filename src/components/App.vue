@@ -22,7 +22,7 @@
             <div class="col-md-8 col-lg-6 col-xl-4">
               <h3 class="mb-4 pb-2 fw-normal">Check the weather forecast</h3>
               <form @submit.prevent="onSubmit">
-                <div class="input-group rounded mb-3">
+                <div class="input-group rounded mb-2">
                   <input
                     type="search"
                     class="form-control rounded"
@@ -119,7 +119,7 @@ export default {
     defaultLayout: "default",
     fullPageLoader: true,
     isLoading: true,
-    loaderColor: "#FD6481",
+    loaderColor: "#343a40",
     tempUnitOptions: [
       {
         id: 1,
@@ -218,15 +218,15 @@ export default {
   },
 
   created() {},
-  mounted() {
+  async mounted() {
     this.$wait.start("loadcontent");
     this.showLoader();
     let x = Math.floor(Math.random() * 24000 + 1);
-    this.geolocationInstance.fetchRandomGeolocation(x);
+    await this.geolocationInstance.fetchRandomGeolocation(x);
     let tempSelectedOption = this.tempUnitOptions.findIndex(
       (item) => item.id === this.tempUnit
     );
-    this.weatherInstance.fetchWeather({
+    await this.weatherInstance.fetchWeather({
       lat: this.latitude,
       lon: this.longitude,
       unit: this.tempUnitOptions[tempSelectedOption].unit,
@@ -277,5 +277,6 @@ export default {
   },
 };
 </script>
+
 
 
